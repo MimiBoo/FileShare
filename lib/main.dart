@@ -12,6 +12,10 @@ import 'package:image_picker/image_picker.dart';
 
 import 'package:path_provider/path_provider.dart';
 
+import 'package:firebase_ml_vision/firebase_ml_vision.dart';
+
+import 'package:downloads_path_provider/downloads_path_provider.dart';
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -37,22 +41,39 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   File _image;
-  String fileName = '';
+  String fileName = 'testing.txt';
+  String data = '';
+
+  //This function read the qr code and decode it.
+  Future decode(File pickedImage) async {
+    FirebaseVisionImage img = FirebaseVisionImage.fromFile(pickedImage);
+    BarcodeDetector barcodeDetector = FirebaseVision.instance.barcodeDetector();
+
+    List barCodes = await barcodeDetector.detectInImage(img);
+
+    for (Barcode code in barCodes) {
+      setState(() {
+        data = code.displayValue;
+      });
+    }
+  }
 
   //This function gets an image from the gallery < a photo of the QR code to scan >
   Future _getImage() async {
-    var image =
-        await ImagePicker.pickImage(source: ImageSource.gallery); //open galley
+    var image = await ImagePicker.pickImage(
+      source: ImageSource.gallery,
+    ); //open galley
 
     setState(() {
       _image = image; //sets the variable with the image you picked.
+      decode(image);
     });
   }
 
   //This function gets the app local path.
   Future<String> get _localPath async {
-    final directory = await getApplicationDocumentsDirectory();
-
+    final directory = await getExternalStorageDirectory();
+    print(directory.path);
     return directory.path;
   }
 
@@ -61,21 +82,23 @@ class _MyHomePageState extends State<MyHomePage> {
     String file = fileName;
     final path = await _localPath;
     print('Path : $path');
-    return File('$path/$file');
+    return File('$path/Download/$file');
   }
 
   //This Function write data to the file.
-  Future<File> writeCounter(String txt) async {
+  Future<File> writeFile(String txt) async {
     final file = await _localFile;
 
     // Write the file
-    return file.writeAsString('$txt');
+    return file.writeAsString(txt, mode: FileMode.write);
   }
 
   //This function opens a <Text file for the moment> file and read its content.
   Future _getFiles() async {
     File temp = await FilePicker.getFile(
-        type: FileType.CUSTOM, fileExtension: 'txt'); //open file
+      type: FileType.CUSTOM,
+      fileExtension: 'txt',
+    ); //open file
 
     Navigator.push(
       context,
@@ -85,7 +108,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
       ),
     );
-    writeCounter(temp.readAsStringSync());
+    writeFile(temp.readAsStringSync());
     print('Stattus: Done');
   }
 
@@ -115,6 +138,8 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
+            data == null ? Text('') : Text(data),
+            SizedBox(height: 25),
             _image != null
                 ? Image.file(
                     _image,
