@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "153067087489",
+    "firebase_url": "https://fileshare-db303.firebaseio.com",
+    "project_id": "fileshare-db303",
+    "storage_bucket": "fileshare-db303.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:153067087489:android:021919a675154fc9",
+        "android_client_info": {
+          "package_name": "com.example.file_share"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "153067087489-j318nibrp2fq6843698e7603275m13v4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDET_lmxi3oEzWIkHP2WU-AyuTM7y5NDdw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "153067087489-j318nibrp2fq6843698e7603275m13v4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
