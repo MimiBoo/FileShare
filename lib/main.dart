@@ -10,6 +10,8 @@ import 'package:file_picker/file_picker.dart';
 
 import 'package:image_picker/image_picker.dart';
 
+import 'package:path_provider/path_provider.dart';
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -35,6 +37,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   File _image;
+  String fileName = '';
 
   //This function gets an image from the gallery < a photo of the QR code to scan >
   Future _getImage() async {
@@ -44,6 +47,29 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _image = image; //sets the variable with the image you picked.
     });
+  }
+
+  //This function gets the app local path.
+  Future<String> get _localPath async {
+    final directory = await getApplicationDocumentsDirectory();
+
+    return directory.path;
+  }
+
+  //This function gets the file local path.
+  Future<File> get _localFile async {
+    String file = fileName;
+    final path = await _localPath;
+    print('Path : $path');
+    return File('$path/$file');
+  }
+
+  //This Function write data to the file.
+  Future<File> writeCounter(String txt) async {
+    final file = await _localFile;
+
+    // Write the file
+    return file.writeAsString('$txt');
   }
 
   //This function opens a <Text file for the moment> file and read its content.
@@ -59,6 +85,23 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
       ),
     );
+    writeCounter(temp.readAsStringSync());
+    print('Stattus: Done');
+  }
+
+  //This function reads data from the file.
+  Future readFile() async {
+    try {
+      final file = await _localFile;
+
+      // Read the file
+      String content = await file.readAsString();
+
+      print('File content: $content');
+    } catch (e) {
+      // If encountering an error, return 0
+      return 0;
+    }
   }
 
   @override
@@ -72,6 +115,13 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
+            _image != null
+                ? Image.file(
+                    _image,
+                    width: 200,
+                    height: 200,
+                  )
+                : Container(),
             SizedBox(height: 25),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -84,16 +134,13 @@ class _MyHomePageState extends State<MyHomePage> {
                   onPressed: _getFiles,
                   child: Text('Send File'),
                 ),
+                RaisedButton(
+                  onPressed: readFile,
+                  child: Text('Read file'),
+                ),
               ],
             ),
             SizedBox(height: 25),
-            _image != null
-                ? Image.file(
-                    _image,
-                    width: 200,
-                    height: 200,
-                  )
-                : Container(),
           ],
         ),
       ),
