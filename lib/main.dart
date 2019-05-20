@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'dart:io';
 
 import 'package:file_share/pages/qrPage.dart';
@@ -13,8 +15,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:firebase_ml_vision/firebase_ml_vision.dart';
-
-import 'package:downloads_path_provider/downloads_path_provider.dart';
 
 void main() => runApp(MyApp());
 
@@ -56,6 +56,7 @@ class _MyHomePageState extends State<MyHomePage> {
         data = code.displayValue;
       });
     }
+    print(data);
   }
 
   //This function gets an image from the gallery < a photo of the QR code to scan >
@@ -86,11 +87,15 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   //This Function write data to the file.
-  Future<File> writeFile(String txt) async {
+  Future writeFile(String txt) async {
     final file = await _localFile;
 
     // Write the file
-    return file.writeAsString(txt, mode: FileMode.write);
+    file.writeAsStringSync(
+      txt,
+      mode: FileMode.write,
+      encoding: utf8,
+    );
   }
 
   //This function opens a <Text file for the moment> file and read its content.
@@ -108,8 +113,9 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
       ),
     );
-    writeFile(temp.readAsStringSync());
-    print('Stattus: Done');
+
+//    writeFile();
+//    print('Stattus: Done');
   }
 
   //This function reads data from the file.
@@ -163,6 +169,12 @@ class _MyHomePageState extends State<MyHomePage> {
                   onPressed: readFile,
                   child: Text('Read file'),
                 ),
+                data == null
+                    ? Container()
+                    : RaisedButton(
+                        onPressed: () => writeFile(data),
+                        child: Text('Write file'),
+                      ),
               ],
             ),
             SizedBox(height: 25),
